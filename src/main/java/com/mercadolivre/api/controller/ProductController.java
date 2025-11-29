@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mercadolivre.api.dto.ProductDTO;
+import com.mercadolivre.api.mapper.ProductMapper;
 import com.mercadolivre.api.model.Product;
 import com.mercadolivre.api.service.ProductService;
 
@@ -27,6 +29,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/api/products")
@@ -35,6 +38,9 @@ public class ProductController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private ProductMapper productMapper;
 
     @SuppressWarnings("null")
     @GetMapping
@@ -79,7 +85,8 @@ public class ProductController {
         @ApiResponse(responseCode = "201", description = "Produto criado com sucesso"),
         @ApiResponse(responseCode = "400", description = "Dados inválidos")
     })
-    public ResponseEntity<EntityModel<Product>> createProduct(@RequestBody Product product) {
+    public ResponseEntity<EntityModel<Product>> createProduct(@Valid @RequestBody ProductDTO productDTO) {
+        Product product = productMapper.toEntity(productDTO);
         Product created = productService.save(product);
 
         EntityModel<Product> resource = EntityModel.of(created,
@@ -94,7 +101,11 @@ public class ProductController {
         @ApiResponse(responseCode = "200", description = "Produto atualizado com sucesso"),
         @ApiResponse(responseCode = "404", description = "Produto não encontrado")
     })
-    public ResponseEntity<EntityModel<Product>> updateProduct(@PathVariable Long id, @RequestBody Product product) {
+    public ResponseEntity<EntityModel<Product>> updateProduct(
+            @PathVariable Long id,
+            @Valid @RequestBody ProductDTO productDTO) {
+
+        Product product = productMapper.toEntity(productDTO);
         Product updated = productService.update(id, product);
 
         @SuppressWarnings("null")
