@@ -14,6 +14,25 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+  devtools:
+    restart:
+      enabled: true
+    livereload:
+      enabled: true
+
+cors:
+  allowed:
+    origins: ${CORS_ALLOWED_ORIGINS:http://localhost:8080}
 
 server:
   port: 8080
+  error:
+    include-message: never
+    include-binding-errors: never
+    include-stacktrace: never
+    include-exception: false
+
+logging:
+  level:
+    root: WARN
+    com.mercadolivre: INFO
