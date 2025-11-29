@@ -1,0 +1,44 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: mercadolivre-db
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - mercadolivre-network
+
+  app:
+    build: .
+    container_name: mercadolivre-api
+    ports:
+      - "${APP_PORT}:8080"
+    environment:
+      SPRING_DATASOURCE_URL: ${SPRING_DATASOURCE_URL}
+      SPRING_DATASOURCE_USERNAME: ${SPRING_DATASOURCE_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${SPRING_DATASOURCE_PASSWORD}
+      SPRING_JPA_HIBERNATE_DDL_AUTO: ${SPRING_JPA_HIBERNATE_DDL_AUTO}
+      SPRING_JPA_SHOW_SQL: ${SPRING_JPA_SHOW_SQL}
+      SPRING_DEVTOOLS_RESTART_ENABLED: "true"
+    volumes:
+      - ./src:/app/src
+      - ./target:/app/target
+      - ~/.m2:/root/.m2
+    depends_on:
+      - postgres
+    networks:
+      - mercadolivre-network
+    restart: unless-stopped
+    command: ["mvn", "spring-boot:run"]
+
+volumes:
+  postgres_data:
+
+networks:
+  mercadolivre-network:
+    driver: bridge

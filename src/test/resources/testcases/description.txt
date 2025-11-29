@@ -1,2 +1,0 @@
-http00.json: Get all models
-http01.json: Delete model by id

@@ -1,0 +1,7 @@
+/app/src/main/java/com/mercadolivre/api/model/Product.java
+/app/src/main/java/com/mercadolivre/api/config/OpenApiConfig.java
+/app/src/main/java/com/mercadolivre/api/controller/ProductController.java
+/app/src/main/java/com/mercadolivre/api/ApiApplication.java
+/app/src/main/java/com/mercadolivre/api/service/ProductService.java
+/app/src/main/java/com/mercadolivre/api/service/ProductServiceImpl.java
+/app/src/main/java/com/mercadolivre/api/repository/ProductRepository.java
