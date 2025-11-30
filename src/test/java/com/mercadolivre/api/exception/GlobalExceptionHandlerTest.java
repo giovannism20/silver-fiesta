@@ -6,7 +6,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
-import java.util.Objects; // Importação adicionada
+import java.util.Objects;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,7 +21,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 
-@DisplayName("GlobalExceptionHandler - Testes Unitários")
+@DisplayName("GlobalExceptionHandler - Unit Tests")
 class GlobalExceptionHandlerTest {
 
     private GlobalExceptionHandler exceptionHandler;
@@ -36,9 +36,9 @@ class GlobalExceptionHandlerTest {
     }
 
     @Test
-    @DisplayName("Deve tratar ResourceNotFoundException")
+    @DisplayName("Should handle ResourceNotFoundException")
     void handleResourceNotFoundException_ShouldReturnNotFound() {
-        ResourceNotFoundException exception = new ResourceNotFoundException("Produto", 1L);
+        ResourceNotFoundException exception = new ResourceNotFoundException("Product", 1L);
 
         ResponseEntity<ErrorResponse> response = exceptionHandler.handleResourceNotFoundException(exception, webRequest);
 
@@ -46,19 +46,18 @@ class GlobalExceptionHandlerTest {
         assertNotNull(response.getBody());
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 
-        // CORREÇÃO: Usar Objects.requireNonNull() para garantir que 'body' não é nulo.
         ErrorResponse body = Objects.requireNonNull(response.getBody());
 
         assertEquals(404, body.getStatus());
         assertEquals("Not Found", body.getError());
-        assertEquals("Produto não encontrado com ID: 1", body.getMessage());
+        assertEquals("Product not found with ID: 1", body.getMessage());
         assertEquals("/api/products/1", body.getPath());
     }
 
     @Test
-    @DisplayName("Deve tratar ResourceNotFoundException com mensagem customizada")
+    @DisplayName("Should handle ResourceNotFoundException with custom message")
     void handleResourceNotFoundException_WithCustomMessage_ShouldReturnNotFound() {
-        ResourceNotFoundException exception = new ResourceNotFoundException("Recurso não encontrado");
+        ResourceNotFoundException exception = new ResourceNotFoundException("Resource not found");
 
         ResponseEntity<ErrorResponse> response = exceptionHandler.handleResourceNotFoundException(exception, webRequest);
 
@@ -66,19 +65,18 @@ class GlobalExceptionHandlerTest {
         assertNotNull(response.getBody());
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
 
-        // CORREÇÃO: Usar Objects.requireNonNull() para garantir que 'body' não é nulo.
         ErrorResponse body = Objects.requireNonNull(response.getBody());
 
-        assertEquals("Recurso não encontrado", body.getMessage());
+        assertEquals("Resource not found", body.getMessage());
     }
 
     @Test
-    @DisplayName("Deve tratar MethodArgumentNotValidException")
+    @DisplayName("Should handle MethodArgumentNotValidException")
     @SuppressWarnings("null")
     void handleValidationException_ShouldReturnBadRequest() {
         BindingResult bindingResult = mock(BindingResult.class);
-        FieldError fieldError1 = new FieldError("product", "name", "Nome é obrigatório");
-        FieldError fieldError2 = new FieldError("product", "price", "Preço deve ser positivo");
+        FieldError fieldError1 = new FieldError("product", "name", "Name is required");
+        FieldError fieldError2 = new FieldError("product", "price", "Price must be positive");
 
         when(bindingResult.getAllErrors()).thenReturn(List.of(fieldError1, fieldError2));
 
@@ -91,22 +89,21 @@ class GlobalExceptionHandlerTest {
         assertNotNull(response.getBody());
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
 
-        // CORREÇÃO: Usar Objects.requireNonNull() para garantir que 'body' não é nulo.
         ErrorResponse body = Objects.requireNonNull(response.getBody());
 
         assertEquals(400, body.getStatus());
         assertEquals("Bad Request", body.getError());
-        assertEquals("Erro de validação nos campos informados", body.getMessage());
+        assertEquals("Validation error in the provided fields", body.getMessage());
         assertNotNull(body.getErrors());
         assertEquals(2, body.getErrors().size());
         assertEquals("name", body.getErrors().get(0).getField());
-        assertEquals("Nome é obrigatório", body.getErrors().get(0).getMessage());
+        assertEquals("Name is required", body.getErrors().get(0).getMessage());
     }
 
     @Test
-    @DisplayName("Deve tratar Exception genérica")
+    @DisplayName("Should handle generic Exception")
     void handleGlobalException_ShouldReturnInternalServerError() {
-        Exception exception = new Exception("Erro interno");
+        Exception exception = new Exception("Internal error");
 
         ResponseEntity<ErrorResponse> response = exceptionHandler.handleGlobalException(exception, webRequest);
 
@@ -114,12 +111,11 @@ class GlobalExceptionHandlerTest {
         assertNotNull(response.getBody());
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, response.getStatusCode());
 
-        // CORREÇÃO: Usar Objects.requireNonNull() para garantir que 'body' não é nulo.
         ErrorResponse body = Objects.requireNonNull(response.getBody());
 
         assertEquals(500, body.getStatus());
         assertEquals("Internal Server Error", body.getError());
-        assertEquals("Ocorreu um erro interno no servidor", body.getMessage());
+        assertEquals("An internal server error occurred", body.getMessage());
         assertEquals("/api/products/1", body.getPath());
     }
 }

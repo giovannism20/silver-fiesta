@@ -3,6 +3,8 @@ package com.mercadolivre.api.exception;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -10,12 +12,12 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final Logger log = LoggerFactory.getLogger(GlobalExceptionHandler.class);
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleResourceNotFoundException(
@@ -51,10 +53,42 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(
             HttpStatus.BAD_REQUEST.value(),
             "Bad Request",
-            "Erro de validação nos campos informados",
+            "Validation error in the provided fields",
             request.getDescription(false).replace("uri=", "")
         );
         error.setErrors(fieldErrors);
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgumentException(
+            IllegalArgumentException ex, WebRequest request) {
+
+        log.warn("Invalid argument: {}", ex.getMessage());
+
+        ErrorResponse error = new ErrorResponse(
+            HttpStatus.BAD_REQUEST.value(),
+            "Bad Request",
+            ex.getMessage(),
+            request.getDescription(false).replace("uri=", "")
+        );
+
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ErrorResponse> handleHandlerMethodValidationException(
+            HandlerMethodValidationException ex, WebRequest request) {
+
+        log.warn("Method validation error: {}", ex.getMessage());
+
+        ErrorResponse error = new ErrorResponse(
+            HttpStatus.BAD_REQUEST.value(),
+            "Bad Request",
+            "Validation error in the provided fields",
+            request.getDescription(false).replace("uri=", "")
+        );
 
         return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
     }
@@ -68,7 +102,7 @@ public class GlobalExceptionHandler {
         ErrorResponse error = new ErrorResponse(
             HttpStatus.INTERNAL_SERVER_ERROR.value(),
             "Internal Server Error",
-            "Ocorreu um erro interno no servidor",
+            "An internal server error occurred",
             request.getDescription(false).replace("uri=", "")
         );
 

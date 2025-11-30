@@ -13,7 +13,7 @@ public class OpenApiConfig {
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
             .info(new Info()
-                .title("Desafio Mercado Livre - API de Produtos")
+                .title("Mercado Libre Challenge - Products API")
             );
     }
 }

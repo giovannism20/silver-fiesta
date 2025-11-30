@@ -13,16 +13,16 @@ spring:
 
   h2:
     console:
-      enabled: true
+      enabled: ${H2_CONSOLE_ENABLED:false}
       path: /h2-console
       settings:
-        web-allow-others: true
+        web-allow-others: false
 
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: create-drop
-    show-sql: ${SPRING_JPA_SHOW_SQL:true}
+      ddl-auto: ${SPRING_JPA_DDL_AUTO:create-drop}
+    show-sql: ${SPRING_JPA_SHOW_SQL:false}
     properties:
       hibernate:
         format_sql: true

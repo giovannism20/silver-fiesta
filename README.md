@@ -1,6 +1,6 @@
-# Desafio Mercado Livre - Giovanni Martins
+# Mercado Libre Challenge - Giovanni Martins
 
-## Como Executar:
+## How to Run:
 
 ```bash
 cp .env.example .env
@@ -8,46 +8,46 @@ cp .env.example .env
 docker compose up
 ```
 
-A aplicação estará disponível em `http://localhost:8080`
+The application will be available at `http://localhost:8080`
 
-### Banco de Dados
+### Database
 
-- **Banco de Dados**: H2 in-memory
-- **Console H2**: http://localhost:8080/h2-console?url=jdbc:h2:mem:mercadolivre
+- **Database**: H2 in-memory
+- **H2 Console**: http://localhost:8080/h2-console?url=jdbc:h2:mem:mercadolivre
 
-**Obs:** O projeto já iniciará com alguns produtos pré-cadastrados.
+**Note:** The project will start with some pre-registered products.
 
-### Monitoramento
+### Monitoring
 
-Para verificar o funcionamento da API via Spring Boot Actuator:
+To check the API status via Spring Boot Actuator:
 
 - Health Check: http://localhost:8080/actuator/health
 
-Exemplo de chamada para verificação:
+Example verification call:
 ```bash
 curl http://localhost:8080/actuator/health
 ```
 
-**Resposta:**
+**Response:**
 ```json
 {
   "status": "UP"
 }
 ```
 
-## Documentação da API
+## API Documentation
 
-Após iniciar a aplicação, acesse:
+After starting the application, access:
 
 - **Swagger UI**: http://localhost:8080/swagger-ui.html
 
-**Importante:** Todos os endpoints da API estão versionados em `/api/v1/*`
+**Important:** All API endpoints are versioned at `/api/v1/*`
 
-## Testes de Performance
+## Performance Tests
 
-O projeto inclui um script automatizado para testes de carga usando `wrk`:
+The project includes an automated script for load testing using `wrk`:
 
-**Pré-requisito:** Instalar `wrk`
+**Prerequisite:** Install `wrk`
 ```bash
 # Ubuntu/Debian
 sudo apt-get install wrk
@@ -60,25 +60,25 @@ brew install wrk
 ./performance-test.sh
 ```
 
-**O script executa 4 cenários de teste:**
-1. Listagem de produtos (paginação padrão)
-2. Busca por ID com cache ativo
-3. Paginação customizada com ordenação
-4. Teste de estresse (200 conexões simultâneas)
+**The script executes 4 test scenarios:**
+1. Product listing (default pagination)
+2. Search by ID with active cache
+3. Custom pagination with sorting
+4. Stress test (200 simultaneous connections)
 
 ## Endpoints
 
-### Listar Produtos
+### List Products
 ```http
 GET /api/v1/products
 ```
 
-**Exemplo com cURL:**
+**Example with cURL:**
 ```bash
 curl -X GET http://localhost:8080/api/v1/products
 ```
 
-**Resposta:**
+**Response:**
 ```json
 [
   {
@@ -90,17 +90,17 @@ curl -X GET http://localhost:8080/api/v1/products
 ]
 ```
 
-### Buscar Produto por ID
+### Get Product by ID
 ```http
 GET /api/v1/products/{id}
 ```
 
-**Exemplo com cURL:**
+**Example with cURL:**
 ```bash
 curl -X GET http://localhost:8080/api/v1/products/1
 ```
 
-**Resposta:**
+**Response:**
 ```json
 {
   "id": 1,
@@ -110,13 +110,13 @@ curl -X GET http://localhost:8080/api/v1/products/1
 }
 ```
 
-### Criar Produto
+### Create Product
 ```http
 POST /api/v1/products
 Content-Type: application/json
 ```
 
-**Exemplo com cURL:**
+**Example with cURL:**
 ```bash
 curl -X POST http://localhost:8080/api/v1/products \
   -H "Content-Type: application/json" \
@@ -127,7 +127,7 @@ curl -X POST http://localhost:8080/api/v1/products \
   }'
 ```
 
-**Resposta (201 Created):**
+**Response (201 Created):**
 ```json
 {
   "id": 6,
@@ -137,50 +137,50 @@ curl -X POST http://localhost:8080/api/v1/products \
 }
 ```
 
-### Atualizar Produto
+### Update Product
 ```http
 PUT /api/v1/products/{id}
 Content-Type: application/json
 ```
 
-**Exemplo com cURL:**
+**Example with cURL:**
 ```bash
 curl -X PUT http://localhost:8080/api/v1/products/1 \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Notebook Dell Atualizado",
-    "description": "Nova descrição",
+    "name": "Updated Notebook Dell",
+    "description": "New description",
     "price": 3800.00
   }'
 ```
 
-**Resposta (200 OK):**
+**Response (200 OK):**
 ```json
 {
   "id": 1,
-  "name": "Notebook Dell Atualizado",
-  "description": "Nova descrição",
+  "name": "Updated Notebook Dell",
+  "description": "New description",
   "price": 3800.00
 }
 ```
 
-### Deletar Produto
+### Delete Product
 ```http
 DELETE /api/v1/products/{id}
 ```
 
-**Exemplo com cURL:**
+**Example with cURL:**
 ```bash
 curl -X DELETE http://localhost:8080/api/v1/products/1
 ```
 
-**Resposta:** 204 No Content (sem corpo de resposta)
+**Response:** 204 No Content (no response body)
 
-## Exemplos de Erros
+## Error Examples
 
-### Validação de Dados (400 Bad Request)
+### Data Validation (400 Bad Request)
 
-**Requisição:**
+**Request:**
 ```bash
 curl -X POST http://localhost:8080/api/v1/products \
   -H "Content-Type: application/json" \
@@ -190,87 +190,87 @@ curl -X POST http://localhost:8080/api/v1/products \
   }'
 ```
 
-**Resposta:**
+**Response:**
 ```json
 {
   "timestamp": "2025-11-30T12:00:00",
   "status": 400,
   "error": "Bad Request",
-  "message": "Erro de validação nos campos informados",
+  "message": "Validation error in the provided fields",
   "path": "/api/v1/products",
   "errors": [
     {
       "field": "name",
-      "message": "Nome é obrigatório"
+      "message": "Name cannot be empty"
     },
     {
       "field": "price",
-      "message": "Preço deve ser positivo"
+      "message": "Price must be greater than zero"
     }
   ]
 }
 ```
 
-### Produto Não Encontrado (404 Not Found)
+### Product Not Found (404 Not Found)
 
-**Requisição:**
+**Request:**
 ```bash
 curl -X GET http://localhost:8080/api/v1/products/999
 ```
 
-**Resposta:**
+**Response:**
 ```json
 {
   "timestamp": "2025-11-30T12:00:00",
   "status": 404,
   "error": "Not Found",
-  "message": "Produto não encontrado com ID: 999",
+  "message": "Product not found with id: 999",
   "path": "/api/v1/products/999"
 }
 ```
 
-## Configuração
+## Configuration
 
 ### CORS
-A aplicação permite requisições apenas de origens específicas configuradas via variável de ambiente:
+The application only allows requests from specific origins configured via environment variable:
 
 ```bash
-# No arquivo .env
+# In .env file
 CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:4200,http://localhost:8080
 ```
 
-### Variáveis de Ambiente
+### Environment Variables
 
-As configurações podem ser customizadas através do arquivo `.env`:
+Settings can be customized through the `.env` file:
 
 ```bash
-# Porta da aplicação
+# Application port
 APP_PORT=8080
 
-# CORS - Origens permitidas (separadas por vírgula)
+# CORS - Allowed origins (comma-separated)
 CORS_ALLOWED_ORIGINS=http://localhost:3000,http://localhost:4200,http://localhost:8080
 
 # Logs
 LOG_LEVEL=DEBUG  # DEBUG, INFO, WARN, ERROR
 ```
 
-## Exemplo de Resposta de Erro
+## Error Response Example
 
 ```json
 {
   "timestamp": "2025-11-30T12:00:00",
   "status": 400,
   "error": "Bad Request",
-  "message": "Erro de validação nos campos informados",
+  "message": "Validation error in the provided fields",
   "path": "/api/v1/products",
   "errors": [
     {
       "field": "name",
-      "message": "Nome é obrigatório"
+      "message": "Name cannot be empty"
     },
     {
       "field": "price",
-      "message": "Preço deve ser positivo"
+      "message": "Price must be greater than zero"
     }
   ]
 }

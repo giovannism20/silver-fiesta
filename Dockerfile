@@ -7,8 +7,6 @@ RUN mvn dependency:go-offline -B
 
 COPY src ./src
 
-RUN mvn clean compile -DskipTests
-
 EXPOSE 8080
 
 CMD ["mvn", "spring-boot:run"]

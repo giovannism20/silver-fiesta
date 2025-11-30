@@ -8,11 +8,11 @@ import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-@DisplayName("ProductRequestDTO - Testes Unitários")
+@DisplayName("ProductRequestDTO - Unit Tests")
 class ProductRequestDTOTest {
 
     @Test
-    @DisplayName("Deve criar ProductRequestDTO com construtor completo")
+    @DisplayName("Should create ProductRequestDTO with full constructor")
     void constructor_ShouldCreateDTOWithAllFields() {
         ProductRequestDTO dto = new ProductRequestDTO("Notebook", "Dell Inspiron", new BigDecimal("3500.00"));
 
@@ -23,7 +23,7 @@ class ProductRequestDTOTest {
     }
 
     @Test
-    @DisplayName("Deve validar igualdade entre ProductRequestDTO")
+    @DisplayName("Should validate equality between ProductRequestDTO")
     void equals_ShouldCompareCorrectly() {
         ProductRequestDTO dto1 = new ProductRequestDTO("Mouse", "Logitech MX Master", new BigDecimal("450.00"));
         ProductRequestDTO dto2 = new ProductRequestDTO("Mouse", "Logitech MX Master", new BigDecimal("450.00"));

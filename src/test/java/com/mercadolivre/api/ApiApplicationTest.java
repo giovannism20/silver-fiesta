@@ -4,13 +4,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
-@DisplayName("ApiApplication - Testes Unitários")
+@DisplayName("ApiApplication - Unit Tests")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 class ApiApplicationTest {
 
     @Test
-    @DisplayName("Deve carregar contexto Spring sem erros")
+    @DisplayName("Should load Spring context without errors")
     void contextLoads() {
-        // Teste passa apenas carregando o contexto sem subir servidor web
+        // Test passes just by loading context without starting web server
     }
 }

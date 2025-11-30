@@ -2,6 +2,8 @@ package com.mercadolivre.api.service;
 
 import java.util.Objects;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
@@ -16,25 +18,27 @@ import com.mercadolivre.api.exception.ResourceNotFoundException;
 import com.mercadolivre.api.mapper.ProductMapper;
 import com.mercadolivre.api.repository.ProductRepository;
 
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-
-@Slf4j
 @Service
-@RequiredArgsConstructor
 public class ProductServiceImpl implements ProductService {
+
+    private static final Logger log = LoggerFactory.getLogger(ProductServiceImpl.class);
 
     private final ProductRepository productRepository;
     private final ProductMapper productMapper;
+
+    public ProductServiceImpl(ProductRepository productRepository, ProductMapper productMapper) {
+        this.productRepository = productRepository;
+        this.productMapper = productMapper;
+    }
 
     @Override
     @Transactional(readOnly = true)
     public Page<ProductResponseDTO> getAllProducts(Pageable pageable) {
         Objects.requireNonNull(pageable, "Pageable cannot be null");
-        log.debug("Buscando produtos com paginação: page={}, size={}", pageable.getPageNumber(), pageable.getPageSize());
+        log.debug("Fetching products with pagination: page={}, size={}", pageable.getPageNumber(), pageable.getPageSize());
         Page<ProductResponseDTO> result = productRepository.findAll(pageable)
                 .map(productMapper::toDto);
-        log.info("Recuperados {} produtos", result.getTotalElements());
+        log.info("Retrieved {} products", result.getTotalElements());
         return result;
     }
 
@@ -43,14 +47,14 @@ public class ProductServiceImpl implements ProductService {
     @Cacheable(value = "products", key = "#id")
     public ProductResponseDTO getProductById(Long id) {
         Objects.requireNonNull(id, "Product ID cannot be null");
-        log.debug("Buscando produto com ID: {}", id);
+        log.debug("Fetching product with ID: {}", id);
         return productRepository.findById(id)
                 .map(product -> {
-                    log.info("Produto encontrado: id={}, name={}", id, product.getName());
+                    log.info("Product found: id={}", id);
                     return productMapper.toDto(product);
                 })
                 .orElseThrow(() -> {
-                    log.warn("Produto não encontrado com id: {}", id);
+                    log.warn("Product not found with id: {}", id);
                     return new ResourceNotFoundException("Product not found with id: " + id);
                 });
     }
@@ -59,11 +63,11 @@ public class ProductServiceImpl implements ProductService {
     @Transactional
     public ProductResponseDTO createProduct(ProductRequestDTO productRequestDTO) {
         Objects.requireNonNull(productRequestDTO, "Product request cannot be null");
-        log.debug("Criando novo produto: name={}", productRequestDTO.name());
+        log.debug("Creating new product: name={}", productRequestDTO.name());
         var product = productMapper.toEntity(productRequestDTO);
         Objects.requireNonNull(product, "Product entity cannot be null");
         var savedProduct = productRepository.save(product);
-        log.info("Produto criado com sucesso: id={}, name={}", savedProduct.getId(), savedProduct.getName());
+        log.info("Product created successfully: id={}", savedProduct.getId());
         return productMapper.toDto(savedProduct);
     }
 
@@ -73,17 +77,17 @@ public class ProductServiceImpl implements ProductService {
     public ProductResponseDTO updateProduct(Long id, ProductRequestDTO productRequestDTO) {
         Objects.requireNonNull(id, "Product ID cannot be null");
         Objects.requireNonNull(productRequestDTO, "Product request cannot be null");
-        log.debug("Atualizando produto: id={}", id);
+        log.debug("Updating product: id={}", id);
         var product = productRepository.findById(id)
                 .orElseThrow(() -> {
-                    log.warn("Produto não encontrado para atualização: id={}", id);
+                    log.warn("Product not found for update: id={}", id);
                     return new ResourceNotFoundException("Product not found with id: " + id);
                 });
 
         productMapper.updateEntityFromDto(productRequestDTO, product);
         Objects.requireNonNull(product, "Product entity cannot be null");
         var updatedProduct = productRepository.save(product);
-        log.info("Produto atualizado com sucesso: id={}, name={}", id, updatedProduct.getName());
+        log.info("Product updated successfully: id={}", id);
         return productMapper.toDto(updatedProduct);
     }
 
@@ -92,12 +96,15 @@ public class ProductServiceImpl implements ProductService {
     @CacheEvict(value = "products", key = "#id")
     public void deleteProduct(Long id) {
         Objects.requireNonNull(id, "Product ID cannot be null");
-        log.debug("Deletando produto: id={}", id);
-        if (!productRepository.existsById(id)) {
-            log.warn("Produto não encontrado para deleção: id={}", id);
-            throw new ResourceNotFoundException("Product not found with id: " + id);
-        }
+        log.debug("Deleting product: id={}", id);
+
+        boolean existed = productRepository.existsById(id);
         productRepository.deleteById(id);
-        log.info("Produto deletado com sucesso: id={}", id);
+
+        if (existed) {
+            log.info("Product deleted successfully: id={}", id);
+        } else {
+            log.info("Product not found for deletion (idempotent operation): id={}", id);
+        }
     }
 }

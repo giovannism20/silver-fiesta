@@ -8,14 +8,14 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 
 public record ProductRequestDTO(
-    @NotBlank(message = "Nome não pode ser vazio")
-    @Size(min = 3, max = 100, message = "Nome deve ter entre 3 e 100 caracteres")
+    @NotBlank(message = "Name cannot be empty")
+    @Size(min = 3, max = 100, message = "Name must be between 3 and 100 characters")
     String name,
 
-    @Size(max = 500, message = "Descrição não pode ter mais de 500 caracteres")
+    @Size(max = 500, message = "Description cannot exceed 500 characters")
     String description,
 
-    @NotNull(message = "Preço é obrigatório")
-    @DecimalMin(value = "0.01", message = "Preço deve ser maior que zero")
+    @NotNull(message = "Price is required")
+    @DecimalMin(value = "0.01", message = "Price must be greater than zero")
     BigDecimal price
 ) {}

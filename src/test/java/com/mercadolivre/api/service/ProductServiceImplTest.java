@@ -33,7 +33,7 @@ import com.mercadolivre.api.model.Product;
 import com.mercadolivre.api.repository.ProductRepository;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("ProductServiceImpl - Testes Unitários")
+@DisplayName("ProductServiceImpl - Unit Tests")
 class ProductServiceImplTest {
 
     @Mock
@@ -72,21 +72,21 @@ class ProductServiceImplTest {
     }
 
     @Test
-    @DisplayName("Deve listar todos os produtos com paginação")
+    @DisplayName("Should list all products with pagination")
     @SuppressWarnings("null")
     void getAllProducts_ShouldReturnPagedProducts() {
         Pageable pageable = PageRequest.of(0, 10);
 
         Product product1 = new Product();
         product1.setId(1L);
-        product1.setName("Produto 1");
-        product1.setDescription("Descrição 1");
+        product1.setName("Product 1");
+        product1.setDescription("Description 1");
         product1.setPrice(new BigDecimal("100.00"));
 
         Product product2 = new Product();
         product2.setId(2L);
-        product2.setName("Produto 2");
-        product2.setDescription("Descrição 2");
+        product2.setName("Product 2");
+        product2.setDescription("Description 2");
         product2.setPrice(new BigDecimal("200.00"));
 
         Page<Product> productPage = new PageImpl<>(Arrays.asList(product1, product2));
@@ -102,7 +102,7 @@ class ProductServiceImplTest {
     }
 
     @Test
-    @DisplayName("Deve buscar produto por ID")
+    @DisplayName("Should get product by ID")
     void getProductById_ShouldReturnProduct() {
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
         when(productMapper.toDto(product)).thenReturn(responseDTO);
@@ -115,7 +115,7 @@ class ProductServiceImplTest {
     }
 
     @Test
-    @DisplayName("Deve lançar exceção quando produto não encontrado")
+    @DisplayName("Should throw exception when product not found")
     void getProductById_ShouldThrowException_WhenNotFound() {
         when(productRepository.findById(anyLong())).thenReturn(Optional.empty());
 
@@ -125,7 +125,7 @@ class ProductServiceImplTest {
     }
 
     @Test
-    @DisplayName("Deve criar novo produto")
+    @DisplayName("Should create new product")
     @SuppressWarnings("null")
     void createProduct_ShouldReturnCreatedProduct() {
         when(productMapper.toEntity(requestDTO)).thenReturn(product);
@@ -140,7 +140,7 @@ class ProductServiceImplTest {
     }
 
     @Test
-    @DisplayName("Deve atualizar produto existente")
+    @DisplayName("Should update existing product")
     @SuppressWarnings("null")
     void updateProduct_ShouldReturnUpdatedProduct() {
         when(productRepository.findById(1L)).thenReturn(Optional.of(product));
@@ -155,7 +155,7 @@ class ProductServiceImplTest {
     }
 
     @Test
-    @DisplayName("Deve deletar produto")
+    @DisplayName("Should delete product")
     void deleteProduct_ShouldDeleteSuccessfully() {
         when(productRepository.existsById(1L)).thenReturn(true);
 

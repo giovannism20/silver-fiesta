@@ -37,7 +37,7 @@ import com.mercadolivre.api.service.ProductService;
 
 @SuppressWarnings("null")
 @WebMvcTest(ProductController.class)
-@DisplayName("ProductController - Testes Unitários")
+@DisplayName("ProductController - Unit Tests")
 class ProductControllerTest {
 
     @Autowired
@@ -69,7 +69,7 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("Deve retornar página de produtos com paginação padrão")
+    @DisplayName("Should return page of products with default pagination")
     void getAllProducts_WithDefaultPagination_ShouldReturnPagedProducts() throws Exception {
         Page<ProductResponseDTO> page = new PageImpl<>(Collections.singletonList(responseDTO));
         when(productService.getAllProducts(any(Pageable.class))).thenReturn(page);
@@ -86,7 +86,7 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("Deve retornar página de produtos com paginação customizada")
+    @DisplayName("Should return page of products with custom pagination")
     void getAllProducts_WithCustomPagination_ShouldReturnPagedProducts() throws Exception {
         Page<ProductResponseDTO> page = new PageImpl<>(
             Collections.singletonList(responseDTO),
@@ -110,7 +110,7 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("Deve retornar produto por ID com sucesso")
+    @DisplayName("Should return product by ID successfully")
     void getProductById_WithValidId_ShouldReturnProduct() throws Exception {
         when(productService.getProductById(1L)).thenReturn(responseDTO);
 
@@ -126,7 +126,7 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("Deve retornar 404 quando produto não for encontrado por ID")
+    @DisplayName("Should return 404 when product not found by ID")
     void getProductById_WithInvalidId_ShouldReturn404() throws Exception {
         when(productService.getProductById(999L))
             .thenThrow(new ResourceNotFoundException("Product not found with id: 999"));
@@ -141,7 +141,7 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("Deve criar produto com sucesso")
+    @DisplayName("Should create product successfully")
     void createProduct_WithValidData_ShouldReturnCreatedProduct() throws Exception {
         when(productService.createProduct(any(ProductRequestDTO.class))).thenReturn(responseDTO);
 
@@ -157,11 +157,11 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("Deve retornar 400 ao criar produto com nome vazio")
+    @DisplayName("Should return 400 when creating product with empty name")
     void createProduct_WithEmptyName_ShouldReturn400() throws Exception {
         ProductRequestDTO invalidDTO = new ProductRequestDTO(
             "",
-            "Descrição válida",
+            "Valid description",
             new BigDecimal("100.00")
         );
 
@@ -174,11 +174,11 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("Deve retornar 400 ao criar produto com nome menor que 3 caracteres")
+    @DisplayName("Should return 400 when creating product with name less than 3 characters")
     void createProduct_WithShortName_ShouldReturn400() throws Exception {
         ProductRequestDTO invalidDTO = new ProductRequestDTO(
             "AB",
-            "Descrição válida",
+            "Valid description",
             new BigDecimal("100.00")
         );
 
@@ -189,11 +189,11 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("Deve retornar 400 ao criar produto com preço nulo")
+    @DisplayName("Should return 400 when creating product with null price")
     void createProduct_WithNullPrice_ShouldReturn400() throws Exception {
         ProductRequestDTO invalidDTO = new ProductRequestDTO(
-            "Produto Válido",
-            "Descrição válida",
+            "Valid Product",
+            "Valid description",
             null
         );
 
@@ -205,11 +205,11 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("Deve retornar 400 ao criar produto com preço negativo")
+    @DisplayName("Should return 400 when creating product with negative price")
     void createProduct_WithNegativePrice_ShouldReturn400() throws Exception {
         ProductRequestDTO invalidDTO = new ProductRequestDTO(
-            "Produto Válido",
-            "Descrição válida",
+            "Valid Product",
+            "Valid description",
             new BigDecimal("-10.00")
         );
 
@@ -220,12 +220,12 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("Deve atualizar produto com sucesso")
+    @DisplayName("Should update product successfully")
     void updateProduct_WithValidData_ShouldReturnUpdatedProduct() throws Exception {
         ProductResponseDTO updatedResponseDTO = new ProductResponseDTO(
             1L,
-            "Notebook Dell Atualizado",
-            "Nova descrição",
+            "Notebook Dell Updated",
+            "New description",
             new BigDecimal("3800.00")
         );
 
@@ -233,8 +233,8 @@ class ProductControllerTest {
             .thenReturn(updatedResponseDTO);
 
         ProductRequestDTO updateDTO = new ProductRequestDTO(
-            "Notebook Dell Atualizado",
-            "Nova descrição",
+            "Notebook Dell Updated",
+            "New description",
             new BigDecimal("3800.00")
         );
 
@@ -243,14 +243,14 @@ class ProductControllerTest {
                 .content(objectMapper.writeValueAsString(updateDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.name").value("Notebook Dell Atualizado"))
+                .andExpect(jsonPath("$.name").value("Notebook Dell Updated"))
                 .andExpect(jsonPath("$.price").value(3800.00));
 
         verify(productService, times(1)).updateProduct(eq(1L), any(ProductRequestDTO.class));
     }
 
     @Test
-    @DisplayName("Deve retornar 404 ao atualizar produto inexistente")
+    @DisplayName("Should return 404 when updating non-existent product")
     void updateProduct_WithInvalidId_ShouldReturn404() throws Exception {
         when(productService.updateProduct(eq(999L), any(ProductRequestDTO.class)))
             .thenThrow(new ResourceNotFoundException("Product not found with id: 999"));
@@ -264,11 +264,11 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("Deve retornar 400 ao atualizar produto com dados inválidos")
+    @DisplayName("Should return 400 when updating product with invalid data")
     void updateProduct_WithInvalidData_ShouldReturn400() throws Exception {
         ProductRequestDTO invalidDTO = new ProductRequestDTO(
             "",
-            "Descrição",
+            "Description",
             new BigDecimal("100.00")
         );
 
@@ -279,7 +279,7 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("Deve deletar produto com sucesso")
+    @DisplayName("Should delete product successfully")
     void deleteProduct_WithValidId_ShouldReturnNoContent() throws Exception {
         doNothing().when(productService).deleteProduct(1L);
 
@@ -291,13 +291,12 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("Deve retornar 404 ao deletar produto inexistente")
+    @DisplayName("Should return 404 when deleting non-existent product")
     void deleteProduct_WithInvalidId_ShouldReturn404() throws Exception {
         doNothing().when(productService).deleteProduct(999L);
         when(productService.getProductById(999L))
             .thenThrow(new ResourceNotFoundException("Product not found with id: 999"));
 
-        // Como deleteProduct pode lançar exception internamente
         mockMvc.perform(delete("/api/v1/products/999")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isNoContent());
@@ -306,17 +305,17 @@ class ProductControllerTest {
     }
 
     @Test
-    @DisplayName("Deve aceitar produto com descrição nula")
+    @DisplayName("Should accept product with null description")
     void createProduct_WithNullDescription_ShouldSucceed() throws Exception {
         ProductRequestDTO dtoWithoutDescription = new ProductRequestDTO(
-            "Produto Simples",
+            "Simple Product",
             null,
             new BigDecimal("100.00")
         );
 
         ProductResponseDTO response = new ProductResponseDTO(
             2L,
-            "Produto Simples",
+            "Simple Product",
             null,
             new BigDecimal("100.00")
         );
@@ -327,12 +326,12 @@ class ProductControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(dtoWithoutDescription)))
                 .andExpect(status().isCreated())
-                .andExpect(jsonPath("$.name").value("Produto Simples"))
+                .andExpect(jsonPath("$.name").value("Simple Product"))
                 .andExpect(jsonPath("$.description").isEmpty());
     }
 
     @Test
-    @DisplayName("Deve retornar página vazia quando não há produtos")
+    @DisplayName("Should return empty page when no products")
     void getAllProducts_WhenNoProducts_ShouldReturnEmptyPage() throws Exception {
         Page<ProductResponseDTO> emptyPage = new PageImpl<>(Collections.emptyList());
         when(productService.getAllProducts(any(Pageable.class))).thenReturn(emptyPage);

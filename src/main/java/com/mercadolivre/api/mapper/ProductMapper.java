@@ -40,7 +40,7 @@ public class ProductMapper {
             return;
         }
 
-        if (dto.name() != null) {
+        if (dto.name() != null && !dto.name().isBlank()) {
             product.setName(dto.name());
         }
         if (dto.description() != null) {

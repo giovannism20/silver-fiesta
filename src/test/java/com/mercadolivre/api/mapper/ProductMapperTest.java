@@ -14,7 +14,7 @@ import com.mercadolivre.api.dto.ProductRequestDTO;
 import com.mercadolivre.api.dto.ProductResponseDTO;
 import com.mercadolivre.api.model.Product;
 
-@DisplayName("ProductMapper - Testes Unitários")
+@DisplayName("ProductMapper - Unit Tests")
 class ProductMapperTest {
 
     private ProductMapper productMapper;
@@ -39,7 +39,7 @@ class ProductMapperTest {
     }
 
     @Test
-    @DisplayName("Deve converter ProductRequestDTO para Product")
+    @DisplayName("Should convert ProductRequestDTO to Product")
     void toEntity_ShouldConvertDTOToEntity() {
         Product result = productMapper.toEntity(requestDTO);
 
@@ -50,7 +50,7 @@ class ProductMapperTest {
     }
 
     @Test
-    @DisplayName("Deve retornar null ao converter ProductRequestDTO null para Product")
+    @DisplayName("Should return null when converting null ProductRequestDTO to Product")
     void toEntity_ShouldReturnNullWhenDTOIsNull() {
         Product result = productMapper.toEntity(null);
 
@@ -58,7 +58,7 @@ class ProductMapperTest {
     }
 
     @Test
-    @DisplayName("Deve converter Product para ProductResponseDTO")
+    @DisplayName("Should convert Product to ProductResponseDTO")
     void toDto_ShouldConvertEntityToResponseDTO() {
         ProductResponseDTO result = productMapper.toDto(product);
 
@@ -70,7 +70,7 @@ class ProductMapperTest {
     }
 
     @Test
-    @DisplayName("Deve retornar null ao converter Product null para ProductResponseDTO")
+    @DisplayName("Should return null when converting null Product to ProductResponseDTO")
     void toDto_ShouldReturnNullWhenEntityIsNull() {
         ProductResponseDTO result = productMapper.toDto(null);
 
@@ -78,11 +78,11 @@ class ProductMapperTest {
     }
 
     @Test
-    @DisplayName("Deve atualizar Product a partir de ProductRequestDTO")
+    @DisplayName("Should update Product from ProductRequestDTO")
     void updateEntityFromDto_ShouldUpdateEntity() {
         ProductRequestDTO updateDTO = new ProductRequestDTO(
-            "Notebook Atualizado",
-            "Nova descrição",
+            "Updated Notebook",
+            "New description",
             new BigDecimal("4000.00")
         );
 
@@ -95,7 +95,7 @@ class ProductMapperTest {
     }
 
     @Test
-    @DisplayName("Não deve atualizar quando DTO é null")
+    @DisplayName("Should not update when DTO is null")
     void updateEntityFromDto_ShouldNotUpdateWhenDTOIsNull() {
         String originalName = product.getName();
 
@@ -105,10 +105,8 @@ class ProductMapperTest {
     }
 
     @Test
-    @DisplayName("Não deve atualizar quando Product é null")
+    @DisplayName("Should not update when Product is null")
     void updateEntityFromDto_ShouldNotUpdateWhenEntityIsNull() {
         productMapper.updateEntityFromDto(requestDTO, null);
-
-        // Não deve lançar exceção
     }
 }
