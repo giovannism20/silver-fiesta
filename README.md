@@ -43,6 +43,29 @@ Após iniciar a aplicação, acesse:
 
 **Importante:** Todos os endpoints da API estão versionados em `/api/v1/*`
 
+## Testes de Performance
+
+O projeto inclui um script automatizado para testes de carga usando `wrk`:
+
+**Pré-requisito:** Instalar `wrk`
+```bash
+# Ubuntu/Debian
+sudo apt-get install wrk
+
+# macOS
+brew install wrk
+```
+
+```bash
+./performance-test.sh
+```
+
+**O script executa 4 cenários de teste:**
+1. Listagem de produtos (paginação padrão)
+2. Busca por ID com cache ativo
+3. Paginação customizada com ordenação
+4. Teste de estresse (200 conexões simultâneas)
+
 ## Endpoints
 
 ### Listar Produtos
