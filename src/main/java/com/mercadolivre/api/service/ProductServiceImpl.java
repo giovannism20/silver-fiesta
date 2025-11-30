@@ -21,14 +21,12 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.findAll();
     }
 
-    @SuppressWarnings("null")
     @Override
     public Product findById(Long id) {
         return productRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Produto não encontrado com ID: " + id));
     }
 
-    @SuppressWarnings("null")
     @Override
     public Product save(Product product) {
         return productRepository.save(product);
@@ -43,7 +41,6 @@ public class ProductServiceImpl implements ProductService {
         return productRepository.save(existingProduct);
     }
 
-    @SuppressWarnings("null")
     @Override
     public void delete(Long id) {
         Product product = findById(id);

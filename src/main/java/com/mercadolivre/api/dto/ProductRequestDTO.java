@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
-public class ProductDTO {
+public class ProductRequestDTO {
 
     @NotBlank(message = "Nome não pode ser vazio")
     @Size(min = 3, max = 100, message = "Nome deve ter entre 3 e 100 caracteres")
@@ -18,9 +18,9 @@ public class ProductDTO {
     @Positive(message = "Preço deve ser positivo")
     private Double price;
 
-    public ProductDTO() {}
+    public ProductRequestDTO() {}
 
-    public ProductDTO(String name, String description, Double price) {
+    public ProductRequestDTO(String name, String description, Double price) {
         this.name = name;
         this.description = description;
         this.price = price;

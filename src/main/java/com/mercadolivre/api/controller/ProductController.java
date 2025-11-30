@@ -1,13 +1,8 @@
 package com.mercadolivre.api.controller;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -19,7 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.mercadolivre.api.dto.ProductDTO;
+import com.mercadolivre.api.dto.ProductRequestDTO;
+import com.mercadolivre.api.dto.ProductResponseDTO;
 import com.mercadolivre.api.mapper.ProductMapper;
 import com.mercadolivre.api.model.Product;
 import com.mercadolivre.api.service.ProductService;
@@ -43,78 +39,62 @@ public class ProductController {
         this.productMapper = productMapper;
     }
 
-    @SuppressWarnings("null")
     @GetMapping
     @Operation(summary = "Listar todos os produtos", description = "Retorna uma lista com todos os produtos cadastrados")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Lista de produtos retornada com sucesso")
     })
-    public ResponseEntity<CollectionModel<EntityModel<Product>>> getAllProducts() {
-        List<EntityModel<Product>> products = productService.findAll().stream()
-            .map(product -> EntityModel.of(product,
-                linkTo(methodOn(ProductController.class).getProductById(product.getId())).withSelfRel(),
-                linkTo(methodOn(ProductController.class).getAllProducts()).withRel("products")))
+    public ResponseEntity<List<ProductResponseDTO>> getAllProducts() {
+        List<ProductResponseDTO> products = productService.findAll().stream()
+            .map(productMapper::toResponseDTO)
             .collect(Collectors.toList());
 
-        return ResponseEntity.ok(
-            CollectionModel.of(products,
-                linkTo(methodOn(ProductController.class).getAllProducts()).withSelfRel())
-        );
+        return ResponseEntity.ok(products);
     }
 
-    @SuppressWarnings("null")
     @GetMapping("/{id}")
     @Operation(summary = "Buscar produto por ID", description = "Retorna um produto específico pelo seu ID")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Produto encontrado"),
         @ApiResponse(responseCode = "404", description = "Produto não encontrado")
     })
-    public ResponseEntity<EntityModel<Product>> getProductById(@PathVariable Long id) {
+    public ResponseEntity<ProductResponseDTO> getProductById(@PathVariable Long id) {
         Product product = productService.findById(id);
+        ProductResponseDTO dto = productMapper.toResponseDTO(product);
 
-        EntityModel<Product> resource = EntityModel.of(product,
-            linkTo(methodOn(ProductController.class).getProductById(id)).withSelfRel(),
-            linkTo(methodOn(ProductController.class).getAllProducts()).withRel("products"));
-
-        return ResponseEntity.ok(resource);
+        return ResponseEntity.ok(dto);
     }
 
-    @SuppressWarnings("null")
     @PostMapping
     @Operation(summary = "Criar novo produto", description = "Cria um novo produto no sistema")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "201", description = "Produto criado com sucesso"),
         @ApiResponse(responseCode = "400", description = "Dados inválidos")
     })
-    public ResponseEntity<EntityModel<Product>> createProduct(@Valid @RequestBody ProductDTO productDTO) {
-        Product product = productMapper.toEntity(productDTO);
+    public ResponseEntity<ProductResponseDTO> createProduct(@Valid @RequestBody ProductRequestDTO productRequestDTO) {
+        Product product = productMapper.toEntity(productRequestDTO);
         Product created = productService.save(product);
+        ProductResponseDTO dto = productMapper.toResponseDTO(created);
 
-        EntityModel<Product> resource = EntityModel.of(created,
-            linkTo(methodOn(ProductController.class).getProductById(created.getId())).withSelfRel());
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(resource);
+        return ResponseEntity.status(HttpStatus.CREATED).body(dto);
     }
 
     @PutMapping("/{id}")
     @Operation(summary = "Atualizar produto", description = "Atualiza os dados de um produto existente")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Produto atualizado com sucesso"),
-        @ApiResponse(responseCode = "404", description = "Produto não encontrado")
+        @ApiResponse(responseCode = "404", description = "Produto não encontrado"),
+        @ApiResponse(responseCode = "400", description = "Dados inválidos")
     })
-    public ResponseEntity<EntityModel<Product>> updateProduct(
+    public ResponseEntity<ProductResponseDTO> updateProduct(
             @PathVariable Long id,
-            @Valid @RequestBody ProductDTO productDTO) {
+            @Valid @RequestBody ProductRequestDTO productRequestDTO) {
 
-        Product product = productMapper.toEntity(productDTO);
+        Product product = productMapper.toEntity(productRequestDTO);
         Product updated = productService.update(id, product);
+        ProductResponseDTO dto = productMapper.toResponseDTO(updated);
 
-        @SuppressWarnings("null")
-        EntityModel<Product> resource = EntityModel.of(updated,
-            linkTo(methodOn(ProductController.class).getProductById(id)).withSelfRel(),
-            linkTo(methodOn(ProductController.class).getAllProducts()).withRel("products"));
-
-        return ResponseEntity.ok(resource);
+        return ResponseEntity.ok(dto);
     }
 
     @DeleteMapping("/{id}")

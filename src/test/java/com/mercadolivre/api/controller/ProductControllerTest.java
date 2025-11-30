@@ -26,7 +26,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.mercadolivre.api.dto.ProductDTO;
+import com.mercadolivre.api.dto.ProductRequestDTO;
+import com.mercadolivre.api.dto.ProductResponseDTO;
 import com.mercadolivre.api.mapper.ProductMapper;
 import com.mercadolivre.api.model.Product;
 import com.mercadolivre.api.service.ProductService;
@@ -48,7 +49,8 @@ class ProductControllerTest {
     private ProductMapper productMapper;
 
     private Product product;
-    private ProductDTO productDTO;
+    private ProductRequestDTO productRequestDTO;
+    private ProductResponseDTO productResponseDTO;
 
     @BeforeEach
     void setUp() {
@@ -58,10 +60,17 @@ class ProductControllerTest {
         product.setDescription("Notebook Dell Inspiron");
         product.setPrice(3500.00);
 
-        productDTO = new ProductDTO();
-        productDTO.setName("Notebook");
-        productDTO.setDescription("Notebook Dell Inspiron");
-        productDTO.setPrice(3500.00);
+        productRequestDTO = new ProductRequestDTO();
+        productRequestDTO.setName("Notebook");
+        productRequestDTO.setDescription("Notebook Dell Inspiron");
+        productRequestDTO.setPrice(3500.00);
+
+        productResponseDTO = new ProductResponseDTO(
+            1L,
+            "Notebook",
+            "Notebook Dell Inspiron",
+            3500.00
+        );
     }
 
     @Test
@@ -69,14 +78,14 @@ class ProductControllerTest {
     void getAllProducts_ShouldReturnProductsList() throws Exception {
         List<Product> products = Arrays.asList(product);
         when(productService.findAll()).thenReturn(products);
+        when(productMapper.toResponseDTO(any(Product.class))).thenReturn(productResponseDTO);
 
         mockMvc.perform(get("/api/products")
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$._embedded.productList[0].id").value(1))
-                .andExpect(jsonPath("$._embedded.productList[0].name").value("Notebook"))
-                .andExpect(jsonPath("$._embedded.productList[0].price").value(3500.00))
-                .andExpect(jsonPath("$._links.self").exists());
+                .andExpect(jsonPath("$[0].id").value(1))
+                .andExpect(jsonPath("$[0].name").value("Notebook"))
+                .andExpect(jsonPath("$[0].price").value(3500.00));
 
         verify(productService, times(1)).findAll();
     }
@@ -85,6 +94,7 @@ class ProductControllerTest {
     @DisplayName("Deve retornar produto por ID com sucesso")
     void getProductById_ShouldReturnProduct() throws Exception {
         when(productService.findById(1L)).thenReturn(product);
+        when(productMapper.toResponseDTO(any(Product.class))).thenReturn(productResponseDTO);
 
         mockMvc.perform(get("/api/products/1")
                 .contentType(MediaType.APPLICATION_JSON))
@@ -92,9 +102,7 @@ class ProductControllerTest {
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Notebook"))
                 .andExpect(jsonPath("$.description").value("Notebook Dell Inspiron"))
-                .andExpect(jsonPath("$.price").value(3500.00))
-                .andExpect(jsonPath("$._links.self.href").exists())
-                .andExpect(jsonPath("$._links.products.href").exists());
+                .andExpect(jsonPath("$.price").value(3500.00));
 
         verify(productService, times(1)).findById(1L);
     }
@@ -102,19 +110,20 @@ class ProductControllerTest {
     @Test
     @DisplayName("Deve criar produto com sucesso")
     void createProduct_ShouldReturnCreatedProduct() throws Exception {
-        when(productMapper.toEntity(any(ProductDTO.class))).thenReturn(product);
+        when(productMapper.toEntity(any(ProductRequestDTO.class))).thenReturn(product);
         when(productService.save(any(Product.class))).thenReturn(product);
+        when(productMapper.toResponseDTO(any(Product.class))).thenReturn(productResponseDTO);
 
         mockMvc.perform(post("/api/products")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(productDTO)))
+                .content(objectMapper.writeValueAsString(productRequestDTO)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.id").value(1))
-                .andExpect(jsonPath("$.name").value("Notebook"))
-                .andExpect(jsonPath("$._links.self.href").exists());
+                .andExpect(jsonPath("$.name").value("Notebook"));
 
-        verify(productMapper, times(1)).toEntity(any(ProductDTO.class));
+        verify(productMapper, times(1)).toEntity(any(ProductRequestDTO.class));
         verify(productService, times(1)).save(any(Product.class));
+        verify(productMapper, times(1)).toResponseDTO(any(Product.class));
     }
 
     @Test
@@ -126,21 +135,28 @@ class ProductControllerTest {
         updatedProduct.setDescription("Notebook Dell Inspiron Atualizado");
         updatedProduct.setPrice(3800.00);
 
-        when(productMapper.toEntity(any(ProductDTO.class))).thenReturn(updatedProduct);
+        ProductResponseDTO updatedResponseDTO = new ProductResponseDTO(
+            1L,
+            "Notebook Atualizado",
+            "Notebook Dell Inspiron Atualizado",
+            3800.00
+        );
+
+        when(productMapper.toEntity(any(ProductRequestDTO.class))).thenReturn(updatedProduct);
         when(productService.update(eq(1L), any(Product.class))).thenReturn(updatedProduct);
+        when(productMapper.toResponseDTO(any(Product.class))).thenReturn(updatedResponseDTO);
 
         mockMvc.perform(put("/api/products/1")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(productDTO)))
+                .content(objectMapper.writeValueAsString(productRequestDTO)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(1))
                 .andExpect(jsonPath("$.name").value("Notebook Atualizado"))
-                .andExpect(jsonPath("$.price").value(3800.00))
-                .andExpect(jsonPath("$._links.self.href").exists())
-                .andExpect(jsonPath("$._links.products.href").exists());
+                .andExpect(jsonPath("$.price").value(3800.00));
 
-        verify(productMapper, times(1)).toEntity(any(ProductDTO.class));
+        verify(productMapper, times(1)).toEntity(any(ProductRequestDTO.class));
         verify(productService, times(1)).update(eq(1L), any(Product.class));
+        verify(productMapper, times(1)).toResponseDTO(any(Product.class));
     }
 
     @Test
@@ -158,7 +174,7 @@ class ProductControllerTest {
     @Test
     @DisplayName("Deve retornar erro 400 ao criar produto com dados inválidos")
     void createProduct_WithInvalidData_ShouldReturnBadRequest() throws Exception {
-        ProductDTO invalidDTO = new ProductDTO();
+        ProductRequestDTO invalidDTO = new ProductRequestDTO();
 
         mockMvc.perform(post("/api/products")
                 .contentType(MediaType.APPLICATION_JSON)
