@@ -1,38 +1,70 @@
+server:
+  port: ${APP_PORT:8080}
+
 spring:
   application:
-    name: mercadolivre-api
+    name: desafio-mercado-livre
+
   datasource:
-    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/mercadolivre}
-    username: ${SPRING_DATASOURCE_USERNAME:admin}
-    password: ${SPRING_DATASOURCE_PASSWORD:admin123}
-    driver-class-name: org.postgresql.Driver
+    url: ${SPRING_DATASOURCE_URL:jdbc:h2:mem:mercadolivre}
+    driverClassName: org.h2.Driver
+    username: ${SPRING_DATASOURCE_USERNAME:sa}
+    password: ${SPRING_DATASOURCE_PASSWORD:}
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+      settings:
+        web-allow-others: true
+
   jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      ddl-auto: ${SPRING_JPA_HIBERNATE_DDL_AUTO:update}
+      ddl-auto: create-drop
     show-sql: ${SPRING_JPA_SHOW_SQL:true}
     properties:
       hibernate:
         format_sql: true
-        dialect: org.hibernate.dialect.PostgreSQLDialect
-  devtools:
-    restart:
-      enabled: true
-    livereload:
-      enabled: true
+        use_sql_comments: true
+    defer-datasource-initialization: true
+
+  sql:
+    init:
+      mode: always
+
+  cache:
+    type: caffeine
+    cache-names: products
+    caffeine:
+      spec: maximumSize=500,expireAfterWrite=10m
 
 cors:
   allowed:
-    origins: ${CORS_ALLOWED_ORIGINS:http://localhost:8080}
+    origins: ${CORS_ALLOWED_ORIGINS:http://localhost:3000,http://localhost:4200,http://localhost:8080}
 
-server:
-  port: 8080
-  error:
-    include-message: never
-    include-binding-errors: never
-    include-stacktrace: never
-    include-exception: false
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+    enabled: true
 
 logging:
   level:
-    root: WARN
-    com.mercadolivre: INFO
+    com.mercadolivre.api: ${LOG_LEVEL:DEBUG}
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+      base-path: /actuator
+  endpoint:
+    health:
+      show-details: when-authorized
+  health:
+    defaults:
+      enabled: true

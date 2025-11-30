@@ -1,13 +1,15 @@
 package com.mercadolivre.api.service;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
-import com.mercadolivre.api.model.Product;
+import com.mercadolivre.api.dto.ProductRequestDTO;
+import com.mercadolivre.api.dto.ProductResponseDTO;
 
 public interface ProductService {
-    List<Product> findAll();
-    Product findById(Long id);
-    Product save(Product product);
-    Product update(Long id, Product product);
-    void delete(Long id);
+    Page<ProductResponseDTO> getAllProducts(Pageable pageable);
+    ProductResponseDTO getProductById(Long id);
+    ProductResponseDTO createProduct(ProductRequestDTO productRequestDTO);
+    ProductResponseDTO updateProduct(Long id, ProductRequestDTO productRequestDTO);
+    void deleteProduct(Long id);
 }

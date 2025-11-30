@@ -12,6 +12,8 @@ public class OpenApiConfig {
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
-            .info(new Info());
+            .info(new Info()
+                .title("Desafio Mercado Livre - API de Produtos")
+            );
     }
 }

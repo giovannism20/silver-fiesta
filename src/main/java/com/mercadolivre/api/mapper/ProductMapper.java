@@ -9,23 +9,11 @@ import com.mercadolivre.api.model.Product;
 @Component
 public class ProductMapper {
 
-    public Product toEntity(ProductRequestDTO dto) {
-        Product product = new Product();
-        product.setName(dto.getName());
-        product.setDescription(dto.getDescription());
-        product.setPrice(dto.getPrice());
-        return product;
-    }
+    public ProductResponseDTO toDto(Product product) {
+        if (product == null) {
+            return null;
+        }
 
-    public ProductRequestDTO toRequestDTO(Product entity) {
-        return new ProductRequestDTO(
-            entity.getName(),
-            entity.getDescription(),
-            entity.getPrice()
-        );
-    }
-
-    public ProductResponseDTO toResponseDTO(Product product) {
         return new ProductResponseDTO(
             product.getId(),
             product.getName(),
@@ -34,9 +22,32 @@ public class ProductMapper {
         );
     }
 
-    public void updateEntityFromDTO(ProductRequestDTO dto, Product entity) {
-        entity.setName(dto.getName());
-        entity.setDescription(dto.getDescription());
-        entity.setPrice(dto.getPrice());
+    public Product toEntity(ProductRequestDTO dto) {
+        if (dto == null) {
+            return null;
+        }
+
+        Product product = new Product();
+        product.setName(dto.name());
+        product.setDescription(dto.description());
+        product.setPrice(dto.price());
+
+        return product;
+    }
+
+    public void updateEntityFromDto(ProductRequestDTO dto, Product product) {
+        if (dto == null || product == null) {
+            return;
+        }
+
+        if (dto.name() != null) {
+            product.setName(dto.name());
+        }
+        if (dto.description() != null) {
+            product.setDescription(dto.description());
+        }
+        if (dto.price() != null) {
+            product.setPrice(dto.price());
+        }
     }
 }
